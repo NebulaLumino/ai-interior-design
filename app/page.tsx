@@ -2,10 +2,10 @@
 import { useState } from 'react';
 
 export default function Home() {
-const [RoomFunction, setRoomFunction] = useState('');
-const [StylePreference, setStylePreference] = useState('');
-const [SpatialConstraints, setSpatialConstraints] = useState('');
-const [BudgetTier, setBudgetTier] = useState('');
+  const [roomFunction, setRoomFunction] = useState('');
+  const [stylePreference, setStylePreference] = useState('');
+  const [spatialConstraints, setSpatialConstraints] = useState('');
+  const [budgetTier, setBudgetTier] = useState('');
   const [output, setOutput] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -17,37 +17,72 @@ const [BudgetTier, setBudgetTier] = useState('');
       const res = await fetch('/api/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ room_function, style_preference, spatial_constraints, budget_tier }),
+        body: JSON.stringify({ room_function: roomFunction, style_preference: stylePreference, spatial_constraints: spatialConstraints, budget_tier: budgetTier }),
       });
       const data = await res.json();
-      setOutput(data.result || data.error || 'No response');
-    } catch(e: any) { setOutput('Error: ' + e.message); }
+      setOutput(data.result || data.error || 'No response generated.');
+    } catch (e: any) { setOutput('Error: ' + e.message); }
     setLoading(false);
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-950 to-gray-900 text-white flex flex-col">
-      <div className="flex-1 flex flex-col items-center justify-center px-6 py-16">
-        <div className="w-full max-w-2xl">
-          <h1 className="text-3xl font-bold mb-2">Interior Design Concept</h1>
-          <p className="text-gray-400 mb-8">Generate interior design concepts with furniture selection.</p>
-          <form onSubmit={handleGenerate} className="space-y-4">
-            <div><label className="block text-sm text-gray-400 mb-1">Room Function</label><input value={RoomFunction} onChange={e=>setRoomFunction(e.target.value)} className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 text-white placeholder-gray-500 focus:outline-none focus:border-blue-400" placeholder="Enter room function..." /></div>
-            <div><label className="block text-sm text-gray-400 mb-1">Style Preference</label><input value={StylePreference} onChange={e=>setStylePreference(e.target.value)} className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 text-white placeholder-gray-500 focus:outline-none focus:border-blue-400" placeholder="Enter style preference..." /></div>
-            <div><label className="block text-sm text-gray-400 mb-1">Spatial Constraints</label><input value={SpatialConstraints} onChange={e=>setSpatialConstraints(e.target.value)} className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 text-white placeholder-gray-500 focus:outline-none focus:border-blue-400" placeholder="Enter spatial constraints..." /></div>
-            <div><label className="block text-sm text-gray-400 mb-1">Budget Tier</label><input value={BudgetTier} onChange={e=>setBudgetTier(e.target.value)} className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 text-white placeholder-gray-500 focus:outline-none focus:border-blue-400" placeholder="Enter budget tier..." /></div>
-            <button type="submit" disabled={loading}
-              className="w-full py-3 rounded-lg font-semibold text-white disabled:opacity-50 transition-opacity"
-              style={backgroundColor: 'hsl(270,65%,55%)'}>
-              {loading ? 'Generating...' : 'Generate'}
-            </button>
-          </form>
-          {output && (
-            <div className="mt-6 p-4 bg-gray-800 border border-gray-700 rounded-lg">
-              <pre className="whitespace-pre-wrap text-sm text-gray-200">{output}</pre>
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-950 to-gray-900 text-white font-sans">
+      <div className="max-w-3xl mx-auto px-6 py-16">
+        <header className="mb-12 text-center">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-blue-500/20 border border-blue-500/30 mb-6">
+            <svg className="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+            </svg>
+          </div>
+          <h1 className="text-4xl font-bold mb-3 bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent">
+            AI Interior Designer
+          </h1>
+          <p className="text-gray-400 text-lg">Generate room layouts, mood boards & furniture plans</p>
+        </header>
+
+        <form onSubmit={handleGenerate} className="space-y-5 mb-8">
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">Room Function</label>
+            <input value={roomFunction} onChange={e => setRoomFunction(e.target.value)} placeholder="e.g. Open-plan living room, Home office, Master bedroom..." required
+              className="w-full bg-gray-800/60 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 transition-colors" />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">Style Preference</label>
+              <select value={stylePreference} onChange={e => setStylePreference(e.target.value)}
+                className="w-full bg-gray-800/60 border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-colors">
+                {['Modern Minimalist', 'Mid-Century Modern', 'Scandinavian', 'Industrial', 'Bohemian', 'Japandi', 'Coastal/Nautical', 'Art Deco', 'Farmhouse', 'Contemporary', 'Traditional', 'Mediterranean'].map(s => <option key={s}>{s}</option>)}
+              </select>
             </div>
-          )}
-        </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">Budget Tier</label>
+              <select value={budgetTier} onChange={e => setBudgetTier(e.target.value)}
+                className="w-full bg-gray-800/60 border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-colors">
+                {['Budget ($)', 'Mid-Range ($$)', 'Premium ($$$)', 'Luxury ($$$$)'].map(b => <option key={b}>{b}</option>)}
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">Spatial Constraints</label>
+            <textarea value={spatialConstraints} onChange={e => setSpatialConstraints(e.target.value)} rows={2}
+              placeholder="e.g. 12x15 ft, limited natural light, load-bearing wall at north end, needs home office corner..."
+              className="w-full bg-gray-800/60 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 transition-colors resize-none" />
+          </div>
+
+          <button type="submit" disabled={loading}
+            className="w-full py-4 rounded-xl font-semibold text-white bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all transform hover:scale-[1.01] active:scale-[0.99]">
+            {loading ? '🏠 Designing Room...' : '🏠 Generate Room Design'}
+          </button>
+        </form>
+
+        {output && (
+          <div className="bg-gray-800/40 border border-gray-700 rounded-2xl p-6">
+            <h3 className="text-sm font-semibold text-blue-400 uppercase tracking-wide mb-3">Interior Design Concept</h3>
+            <pre className="text-gray-300 text-sm whitespace-pre-wrap font-mono leading-relaxed">{output}</pre>
+          </div>
+        )}
       </div>
     </div>
   );
